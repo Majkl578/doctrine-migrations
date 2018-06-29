@@ -11,6 +11,15 @@ cache:
   directories:
     - $HOME/.composer/cache
 
+deploy:
+    provider: releases
+    api_key:
+        secure: $DEPLOY_TOKEN_SECURE
+    file: build/doctrine-migrations.phar
+    skip_cleanup: true
+    on:
+        tags: true
+
 before_install:
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
 
@@ -53,3 +62,7 @@ jobs:
       env: STATIC_ANALYSIS
       install: travis_retry composer install --prefer-dist
       script: vendor/bin/phpstan analyse
+
+    - stage: Build release PHAR
+      php: 7.1
+      script: ./build-phar.sh
